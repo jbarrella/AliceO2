@@ -18,10 +18,11 @@
 #include "CommonUtils/ConfigurableParam.h"
 
 // for TRD
-#include "TRDWorkflow/TRDTrapSimulatorSpec.h"
-#include "TRDWorkflow/TRDTrackletWriterSpec.h"
-#include "TRDWorkflow/TRDTrapRawWriterSpec.h"
-#include "TRDWorkflow/TRDDigitReaderSpec.h"
+// #include "TRDWorkflow/TRDTrapSimulatorSpec.h"
+// #include "TRDWorkflow/TRDTrackletWriterSpec.h"
+// #include "TRDWorkflow/TRDTrapRawWriterSpec.h"
+// #include "TRDWorkflow/TRDDigitReaderSpec.h"
+#include "TRDWorkflow/TRDTrackletCalibratorSpec.h"
 
 #include "DataFormatsParameters/GRPObject.h"
 

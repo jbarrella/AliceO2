@@ -10,8 +10,8 @@
 
 // #ifndef O2_TRD_TRACKLETCALIBRATORWORKFLOW_SRC_TRDTRACKLETCALIBRATORSPEC_H_
 // #define O2_TRD_TRACKLETCALIBRATORWORKFLOW_SRC_TRDTRACKLETCALIBRATORSPEC_H_
-#ifndef O2_TRDTRACKLETCALIBRATORSPEC_H
-#define O2_TRDTRACKLETCALIBRATORSPEC_H
+// #ifndef O2_TRDTRACKLETCALIBRATORSPEC_H
+// #define O2_TRDTRACKLETCALIBRATORSPEC_H
 
 #include "Framework/ConfigParamRegistry.h"
 #include "Framework/ControlService.h"
@@ -31,8 +31,8 @@ namespace trd
 class TRDTrackletCalibratorSpec : public o2::framework::Task
 {
  public:
-  TRDTrackletCalibratorSpec();
-  ~TRDTrackletCalibratorSpec() override = default;
+  // TRDTrackletCalibratorSpec();
+  // ~TRDTrackletCalibratorSpec() override = default;
   void init(o2::framework::InitContext& ic) override;
   void run(o2::framework::ProcessingContext& pc) override;
 };
@@ -42,4 +42,4 @@ o2::framework::DataProcessorSpec getTRDTrackletCalibratorSpec();
 } // end namespace trd
 } // end namespace o2
 
-#endif // O2_TRDTRAPSIMULATORTRACKLETWRITER_H
+// #endif // O2_TRDTRAPSIMULATORTRACKLETWRITER_H

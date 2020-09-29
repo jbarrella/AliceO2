@@ -33,6 +33,7 @@ o2_add_executable(trap-sim
                                         O2::DataFormatsTRD
                                         O2::TRDWorkflow)
 
+
 o2_add_library(TRDCalibratorWorkflow
                TARGETVARNAME targetName
                SOURCES src/TRDTrackletCalibratorSpec.cxx
@@ -47,8 +48,7 @@ o2_add_executable(tracklet-calibrator
                                         O2::Steer
                                         O2::TRDBase
                                         O2::DataFormatsTRD
-                                        O2::TRDCalibratorWorkflow
-                                        O2::TRDWorkflow)
+                                        O2::TRDCalibratorWorkflow)
 
 if (OpenMP_CXX_FOUND)
     target_compile_definitions(${targetName} PRIVATE WITH_OPENMP)

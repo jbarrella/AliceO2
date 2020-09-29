@@ -28,7 +28,7 @@ using namespace trd;
 
 void TRDTrackletCalibratorSpec::init(o2::framework::InitContext& ic)
 {
-  LOG(info) << "initializing tracklet calibrator";
+  LOG(info) << "initializing tracklet calibratorssss";
 }
 
 
@@ -117,7 +117,7 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
 
     // h1d_position->Fill(position);
 
-    // LOG(info) << "x: " << x << " | " << "y: " << y << " | " << "z: " << z << " | " << "dy: " << dy;
+    LOG(info) << "x: " << x << " | " << "y: " << y << " | " << "z: " << z << " | " << "dy: " << dy;
 
 
     // CALIBRATE dy and t0
@@ -140,9 +140,9 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
 
     float cmSlope = dy/driftDepth;
 
-    dy += - (TMath::Tan(lorentzAngle) * driftDepth) \
-          + (TMath::Tan(oldLorentzAngle) * driftDepth * driftVRatio) \
-          + cmSlope * (driftDepth * (1 - driftVRatio));
+    // dy += - (TMath::Tan(lorentzAngle) * driftDepth) \
+    //       + (TMath::Tan(oldLorentzAngle) * driftDepth * driftVRatio) \
+    //       + cmSlope * (driftDepth * (1 - driftVRatio));
 
     // LOG(info) << "dy: " << dy;
     // LOG(info);s
