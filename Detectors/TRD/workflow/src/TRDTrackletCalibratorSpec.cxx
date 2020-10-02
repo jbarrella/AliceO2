@@ -8,15 +8,8 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-
-// #include <cstdlib>
-// #include <cmath>
-#include "TRDBase/TRDGeometry.h"
 #include "TRDWorkflow/TRDTrackletCalibratorSpec.h"
-#include "DataFormatsTRD/TriggerRecord.h"
-#include "DataFormatsTRD/Tracklet64.h"
-#include <TH1D.h>
-#include <TCanvas.h>
+
 
 using namespace o2::framework;
 using SubSpecificationType = o2::framework::DataAllocator::SubSpecificationType;
@@ -39,9 +32,9 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
   TH1D* h1d_position = new TH1D("position", "position", 256, 0, 2048);
   TCanvas* h1d_position_can = new TCanvas("position", "position", 10, 10, 800, 600);
 
+  std::vector<Tracklet64> calibratedTracklets;
   std::vector<TriggerRecord> triggerRec = pc.inputs().get<std::vector<TriggerRecord>>("triggerRecord");
   std::vector<Tracklet64> tracklets = pc.inputs().get<std::vector<Tracklet64>>("inTracklets");
-  std::vector<Tracklet64> calibratedTracklets;
 
   for (int reci=0; reci < triggerRec.size(); reci++)
   {
@@ -140,9 +133,9 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
 
     float cmSlope = dy/driftDepth;
 
-    // dy += - (TMath::Tan(lorentzAngle) * driftDepth) \
-    //       + (TMath::Tan(oldLorentzAngle) * driftDepth * driftVRatio) \
-    //       + cmSlope * (driftDepth * (1 - driftVRatio));
+    dy += - (TMath::Tan(lorentzAngle) * driftDepth) \
+          + (TMath::Tan(oldLorentzAngle) * driftDepth * driftVRatio) \
+          + cmSlope * (driftDepth * (1 - driftVRatio));
 
     // LOG(info) << "dy: " << dy;
     // LOG(info);s

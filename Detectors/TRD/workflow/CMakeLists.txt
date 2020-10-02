@@ -37,7 +37,7 @@ o2_add_executable(trap-sim
 o2_add_library(TRDCalibratorWorkflow
                TARGETVARNAME targetName
                SOURCES src/TRDTrackletCalibratorSpec.cxx
-                       PUBLIC_LINK_LIBRARIES O2::Framework O2::DPLUtils O2::Steer O2::Algorithm O2::DataFormatsTRD O2::TRDSimulation O2::DetectorsBase O2::SimulationDataFormat O2::TRDBase)
+                       PUBLIC_LINK_LIBRARIES O2::Framework O2::DPLUtils O2::Algorithm O2::DataFormatsTRD O2::TRDSimulation O2::DetectorsBase O2::SimulationDataFormat O2::TRDBase)
 
 
 o2_add_executable(tracklet-calibrator
@@ -45,7 +45,6 @@ o2_add_executable(tracklet-calibrator
                   SOURCES src/TRDTrackletCalibratorWorkflow.cxx
                   PUBLIC_LINK_LIBRARIES O2::Framework
                                         O2::DPLUtils
-                                        O2::Steer
                                         O2::TRDBase
                                         O2::DataFormatsTRD
                                         O2::TRDCalibratorWorkflow)
