@@ -53,7 +53,7 @@ public:
     geo->createPadPlaneArray();
   }
 
-  vector<double> getSpacePoint(int padrow, int column, int hcid, int position)
+  vector<double> getSpacePoint(int hcid, int padrow, int column, int position)
   {
     int idet = hcid/2;
     int ilayer = (idet % 30) % 6;
@@ -94,135 +94,18 @@ public:
 
     return {x, y, z};
   }
+
+  double getDy(int slope)
+  {
+    float driftHeight = geo->cdrHght();
+    float vDrift = 1.56;
+    double padWidth = padPlane->getWidthIPad();
+
+    double dy = slope * ((driftHeight / vDrift) / 0.1) * padWidth * 1/1000.;
+
+    return dy;
+  }
 };
-
-
-void plot(SpacePointConverter spc, vector<double> point, int detector)
-{
-  LOG(info) << "plotting";
-  TCanvas* can1 = new TCanvas("trd","ptrd",0,0,1600,1600);
-
-  gPad->Range(-75,-75,75,75);
-
-  int ilayer = (detector % 30) % 6;
-  int istack = (detector % 30) / 6;
-
-  auto plotgeo = o2::trd::TRDGeometry::instance();
-  plotgeo->createPadPlaneArray();
-
-  LOG(info) << "LAYER: " << ilayer << istack;
-  auto padPlane = plotgeo->getPadPlane(ilayer, istack);
-
-  // inner: pads [1,142] | outer: pads 0,143
-  double padWidth = padPlane->getWidthIPad();             // pad dimension in rphi-direction
-  double padLength = padPlane->getLengthIPad();           // pad dimension in z-direction (I=inner, O=outer)
-  double oPadWidth = padPlane->getWidthOPad();
-  double oPadLength = padPlane->getLengthOPad();
-  int nPadRows = padPlane->getNrows();
-
-  // double chamberWidth = geo->getChamberWidth(ilayer);
-  // double chamberLength = geo->getChamberLength(ilayer, istack);
-
-  double padPlaneWidth = abs(padPlane->getColEnd() - padPlane->getCol0());
-  double padPlaneLength = abs(padPlane->getRowEnd() - padPlane->getRow0());
-
-  LOG(info) << "length: " << padPlaneLength;
-
-
-  TBox* trdBox = new TBox(-padPlaneWidth/2, -padPlaneLength/2, padPlaneWidth/2, padPlaneLength/2);
-  trdBox->SetLineWidth(1);
-  trdBox->SetLineColor(kGreen);
-  trdBox->Draw("l");
-
-  TLine* vLines[144];
-  TLine* hLines[nPadRows];
-
-
-
-  // assume that padrows, columns, and MCMs each begin exactly where the previous one ends - no spaces
-  // start from the middle (0,0) to take into account chamber "rim"
-  // (0,0) is not the center of the physical chamber. Rather, it is the center of the pad rows and columns (alignable vol?)
-
-  for (int i=1; i<144/2; i++){
-    vLines[i] = new TLine(-padWidth*i, -padPlaneLength/2, -padWidth*i, padPlaneLength/2);
-    // vLines[i]->SetLineColor(kWhite);
-    if (i%18 == 0){
-      vLines[i]->SetLineColor(kBlue);
-    }
-  }
-
-  for (int i=144/2; i<144; i++){
-    vLines[i] = new TLine(padWidth*(i-144/2), -padPlaneLength/2, padWidth*(i-144/2), padPlaneLength/2);
-    // vLines[i]->SetLineColor(kWhite);
-    if (i%18 == 0){
-      vLines[i]->SetLineColor(kBlue);
-    }
-  }
-
-  for (int i=1; i<144; i++){
-    vLines[i]->Draw();
-  }
-
-
-  for (int i=1; i<nPadRows/2; i++){
-    hLines[i] = new TLine(-padPlaneWidth/2, -padLength*i, padPlaneWidth/2, -padLength*i);
-  }
-
-  for (int i=nPadRows/2; i<nPadRows; i++){
-    hLines[i] = new TLine(-padPlaneWidth/2, padLength*(i-nPadRows/2), padPlaneWidth/2, padLength*(i-nPadRows/2));
-  }
-
-  for (int i=1; i<nPadRows; i++){
-    hLines[i]->Draw();
-  }
-
-
-  TMarker* spacePoint = new TMarker(point[1], point[2], 20);
-  spacePoint->SetMarkerColor(kRed);
-  spacePoint->SetMarkerSize(2);
-  spacePoint->Draw();
-
-  for (int i=0; i<locMCHits.size(); i++) {
-    TMarker* mcHitMark = new TMarker(locMCHits[i][0],locMCHits[i][1],20);
-    mcHitMark->SetMarkerColor(kYellow);
-    mcHitMark->SetMarkerSize(1);
-    mcHitMark->Draw();
-  }
-
-  for (int i=0; i<locDigits.size(); i++) {
-
-    int pad = locDigits[i][0];
-    int padrow = locDigits[i][1];
-    int side = pad/72;
-    int hcid = detector * 2 + side;
-    int column = (pad % 72) / 18;
-
-    int padMCM = pad % 18;
-    int position = 1024 + (padMCM - 10) * 75;
-
-    vector<double> digitPoint = spc.getSpacePoint(padrow, column, hcid, position);
-
-    TMarker* digitMark = new TMarker(digitPoint[1], -digitPoint[2], 20);
-    digitMark->SetMarkerColor(kRed);
-    digitMark->SetMarkerSize(1);
-    digitMark->Draw();
-  }
-
-  TArrow *ar1 = new TArrow(-70,-70,-70,-62,0.01,"|>");
-  ar1->SetLineWidth(1.5);
-  ar1->Draw();
-  TArrow *ar2 = new TArrow(-70,-70,-62,-70,0.01,"|>");
-  ar2->SetLineWidth(1.5);
-  ar2->Draw();
-
-  TLatex latex;
-  latex.SetTextSize(0.025);
-  latex.SetTextAlign(13);
-  latex.DrawLatex(-68,-60,"z");
-  latex.DrawLatex(-60,-68,"y");
-
-  can1->Print("plot.pdf");
-}
 
 
 void readMCpoints(int detector)
@@ -291,6 +174,132 @@ void readDigits(int detector)
 }
 
 
+void plot(SpacePointConverter spc, vector<double> point, int detector)
+{
+  LOG(info) << "plotting";
+  TCanvas* can1 = new TCanvas("trd","ptrd",0,0,1600,1600);
+
+  gPad->Range(-75,-75,75,75);
+
+  int ilayer = (detector % 30) % 6;
+  int istack = (detector % 30) / 6;
+
+  auto plotgeo = o2::trd::TRDGeometry::instance();
+  plotgeo->createPadPlaneArray();
+
+  auto padPlane = plotgeo->getPadPlane(ilayer, istack);
+
+  // inner: pads [1,142] | outer: pads 0,143
+  double padWidth = padPlane->getWidthIPad();             // pad dimension in rphi-direction
+  double padLength = padPlane->getLengthIPad();           // pad dimension in z-direction (I=inner, O=outer)
+  double oPadWidth = padPlane->getWidthOPad();
+  double oPadLength = padPlane->getLengthOPad();
+  int nPadRows = padPlane->getNrows();
+
+  // double chamberWidth = geo->getChamberWidth(ilayer);
+  // double chamberLength = geo->getChamberLength(ilayer, istack);
+
+  double padPlaneWidth = abs(padPlane->getColEnd() - padPlane->getCol0());
+  double padPlaneLength = abs(padPlane->getRowEnd() - padPlane->getRow0());
+  
+
+  TBox* trdBox = new TBox(-padPlaneWidth/2, -padPlaneLength/2, padPlaneWidth/2, padPlaneLength/2);
+  trdBox->SetLineWidth(1);
+  trdBox->SetLineColor(kGreen);
+  trdBox->Draw("l");
+
+  TLine* vLines[144];
+  TLine* hLines[nPadRows];
+
+
+  // assume that padrows, columns, and MCMs each begin exactly where the previous one ends - no spaces
+  // start from the middle (0,0) to take into account chamber "rim"
+  // (0,0) is not the center of the physical chamber. Rather, it is the center of the pad rows and columns (alignable vol?)
+
+  for (int i=1; i<144/2; i++){
+    vLines[i] = new TLine(-padWidth*i, -padPlaneLength/2, -padWidth*i, padPlaneLength/2);
+    // vLines[i]->SetLineColor(kWhite);
+    if (i%18 == 0){
+      vLines[i]->SetLineColor(kBlue);
+    }
+  }
+
+  for (int i=144/2; i<144; i++){
+    vLines[i] = new TLine(padWidth*(i-144/2), -padPlaneLength/2, padWidth*(i-144/2), padPlaneLength/2);
+    // vLines[i]->SetLineColor(kWhite);
+    if (i%18 == 0){
+      vLines[i]->SetLineColor(kBlue);
+    }
+  }
+
+  for (int i=1; i<144; i++){
+    vLines[i]->Draw();
+  }
+
+
+  for (int i=1; i<nPadRows/2; i++){
+    hLines[i] = new TLine(-padPlaneWidth/2, -padLength*i, padPlaneWidth/2, -padLength*i);
+  }
+
+  for (int i=nPadRows/2; i<nPadRows; i++){
+    hLines[i] = new TLine(-padPlaneWidth/2, padLength*(i-nPadRows/2), padPlaneWidth/2, padLength*(i-nPadRows/2));
+  }
+
+  for (int i=1; i<nPadRows; i++){
+    hLines[i]->Draw();
+  }
+
+
+  //---------------------------------------------------------------------------------------------------------------------
+
+  TMarker* spacePoint = new TMarker(point[1], point[2], 20);
+  spacePoint->SetMarkerColor(kRed);
+  spacePoint->SetMarkerSize(2);
+  // spacePoint->Draw();
+
+  for (int i=0; i<locMCHits.size(); i++) {
+    TMarker* mcHitMark = new TMarker(locMCHits[i][0],locMCHits[i][1],20);
+    mcHitMark->SetMarkerColor(kYellow);
+    mcHitMark->SetMarkerSize(1);
+    mcHitMark->Draw();
+  }
+
+  for (int i=0; i<locDigits.size(); i++) {
+
+    int pad = locDigits[i][0];
+    int padrow = locDigits[i][1];
+    int side = pad/72;
+    int hcid = detector * 2 + side;
+    int column = (pad % 72) / 18;
+
+    int padMCM = pad % 18;
+    int position = 1024 + (padMCM - 10) * 75;
+
+    vector<double> digitPoint = spc.getSpacePoint(hcid, padrow, column, position);
+
+    TMarker* digitMark = new TMarker(digitPoint[1], -digitPoint[2], 20);
+    digitMark->SetMarkerColor(kRed);
+    digitMark->SetMarkerSize(1);
+    digitMark->Draw();
+  }
+
+  TArrow *ar1 = new TArrow(-70,-70,-70,-62,0.01,"|>");
+  ar1->SetLineWidth(1.5);
+  ar1->Draw();
+  TArrow *ar2 = new TArrow(-70,-70,-62,-70,0.01,"|>");
+  ar2->SetLineWidth(1.5);
+  ar2->Draw();
+
+  TLatex latex;
+  latex.SetTextSize(0.025);
+  latex.SetTextAlign(13);
+  latex.DrawLatex(-68,-60,"z");
+  latex.DrawLatex(-60,-68,"y");
+
+  can1->Print("plot.pdf");
+}
+
+
 void TRDTrackletCalibratorSpec::init(o2::framework::InitContext& ic)
 {
   LOG(info) << "initializing tracklet calibrator";
@@ -308,10 +317,8 @@ void TRDTrackletCalibratorSpec::init(o2::framework::InitContext& ic)
   uint64_t column = 1;        // 0-3 | always 0 at the moment
   uint64_t position = 1024;    // 0-2047 | units:pad-widths | granularity=1/75 (measured from center pad 10) 1024 is 0/center of pad 10
 
-  vector<double> plotPoint = spc.getSpacePoint(padrow, column, hcid, position);
+  vector<double> plotPoint = spc.getSpacePoint(hcid, padrow, column, position);
 
-
-  // vector<double> plotPoint = {0.0,0.0,0.0};
 
   readMCpoints(idet);
 
@@ -332,12 +339,12 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
   // std::vector<TriggerRecord> triggerRec = pc.inputs().get<std::vector<TriggerRecord>>("triggerRecord");
   // std::vector<Tracklet64> tracklets = pc.inputs().get<std::vector<Tracklet64>>("inTracklets");
 
-  // for (int reci=0; reci < triggerRec.size(); reci++)
-  // {
-  //   LOG(info) << triggerRec[reci].getFirstEntry() << " | " << triggerRec[reci].getNumberOfObjects();
-  // }
+  // // for (int reci=0; reci < triggerRec.size(); reci++)
+  // // {
+  // //   LOG(info) << triggerRec[reci].getFirstEntry() << " | " << triggerRec[reci].getNumberOfObjects();
+  // // }
 
-  // LOG(info) << tracklets.size();
+  // // LOG(info) << tracklets.size();
 
   // int nTimeBins = 24;
 
@@ -354,6 +361,7 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
   //   // {
   //   //   LOG(info) << triggerRec[reci].getFirstEntry() << " | " << triggerRec[reci].getNumberOfObjects();
   //   // }
+    
 
   //   double vDrift = 1.56;
 
@@ -379,6 +387,8 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
   //   uint64_t column = tracklet->getColumn();        // 0-3 | always 0 at the moment
   //   uint64_t position = tracklet->getPosition();    // 0-2048 | units:pad-widths | granularity=1/75 (measured from center pad 10) 1024 is 0/cetner of pad 10
   //   uint64_t slope = tracklet->getSlope();          // 0-127 | units:pads/timebin | granularity=1/1000
+
+  //   // vector<double> plotPoint = spc.getSpacePoint(hcid, padrow, column, position);
 
   //   // uncertainties ?
     
@@ -432,6 +442,9 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
   //   dy += - (TMath::Tan(lorentzAngle) * driftDepth) \
   //         + (TMath::Tan(oldLorentzAngle) * driftDepth * driftVRatio) \
   //         + cmSlope * (driftDepth * (1 - driftVRatio));
+
+
+    //--------------------------------------------------------------------------------------------------------------
 
     // LOG(info) << "dy: " << dy;
     // LOG(info);s
