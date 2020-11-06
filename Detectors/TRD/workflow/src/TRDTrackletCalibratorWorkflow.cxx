@@ -34,5 +34,11 @@ void customize(std::vector<o2::framework::ConfigParamSpec>& workflowoptions)
 WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
 {
   return WorkflowSpec{
-    o2::trd::getTRDTrackletCalibratorSpec()};
+    // read uncalibrated trackelts
+    // o2::trd::getTRDTrackletReaderSpec(),
+    // transform and calibrate
+    o2::trd::getTRDTrackletCalibratorSpec(),
+    // write calibrated tracklets
+    // o2::trd::getTRDTrackletWriterSpec()
+    };
 }
