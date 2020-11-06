@@ -30,7 +30,7 @@
 #include <TGraph.h>
 #include <TCanvas.h>
 #include <TMath.h>
-#include "TRDBase/TRDGeometry.h"
+#include "TRDBase/Geometry.h"
 
 
 namespace o2

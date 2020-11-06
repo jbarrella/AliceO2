@@ -20,13 +20,13 @@
 
 #include "FairLogger.h"
 #include "TRDSimulation/Detector.h"
-#include "TRDBase/TRDGeometry.h"
+#include "TRDBase/Geometry.h"
 #include "TRDBase/Calibrations.h"
 #include "DetectorsCommonDataFormats/NameConf.h"
 #include "DetectorsCommonDataFormats/DetID.h"
 
-#include "TRDBase/TRDSimParam.h"
-#include "TRDBase/TRDCommonParam.h"
+#include "TRDBase/SimParam.h"
+#include "TRDBase/CommonParam.h"
 #include "DataFormatsTRD/Constants.h"
 
 
@@ -92,8 +92,13 @@ public:
     return {x, y, z};
   }
 
-  double calculateDy(int slope)
+  double calculateDy(int hcid, int slope)
   {
+    int idet = hcid/2;
+    int ilayer = (idet % 30) % 6;
+    int istack = (idet % 30) / 6;
+    auto padPlane = geo->getPadPlane(ilayer, istack);
+
     float driftHeight = geo->cdrHght();
     float vDrift = 1.56;
     double padWidth = padPlane->getWidthIPad();
@@ -128,7 +133,7 @@ void TRDTrackletCalibratorSpec::init(o2::framework::InitContext& ic)
 
 void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
 {
-  LOG(info) << "running tracklet calibrator";
+  LOG(info) << "running tracklet calsssibrator";
 
   // TH1D* h1d_position = new TH1D("position", "position", 256, 0, 2048);
   // TCanvas* h1d_position_can = new TCanvas("position", "position", 10, 10, 800, 600);
@@ -146,7 +151,7 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
 
   // int nTimeBins = 24;
 
-  // auto geo = o2::trd::TRDGeometry::instance();
+  // auto geo = o2::trd::Geometry::instance();
   // geo->createPadPlaneArray();
 
   // for (int itracklet; itracklet < 550; ++itracklet) {
