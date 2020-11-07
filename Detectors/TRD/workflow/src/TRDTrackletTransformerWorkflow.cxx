@@ -8,7 +8,7 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-#include "TRDWorkflow/TRDTrackletCalibratorSpec.h"
+#include "TRDWorkflow/TRDTrackletTransformerSpec.h"
 #include "TRDWorkflow/TRDCalibratedTrackletWriterSpec.h"
 #include "TRDWorkflow/TRDTrackletReaderSpec.h"
 
@@ -47,7 +47,7 @@ WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
 
   if (rootIn) spec.emplace_back(o2::trd::getTRDTrackletReaderSpec(0));
 
-  spec.emplace_back(o2::trd::getTRDTrackletCalibratorSpec());
+  spec.emplace_back(o2::trd::getTRDTrackletTransformerSpec());
 
   if (rootOut) spec.emplace_back(o2::trd::getTRDCalibratedTrackletWriterSpec());
   

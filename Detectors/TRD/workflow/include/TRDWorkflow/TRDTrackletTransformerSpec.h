@@ -8,11 +8,10 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-#ifndef O2_TRDCALIBRATEDTRACKLETWRITER_H
-#define O2_TRDCALIBRATEDTRACKLETWRITER_H
-
-
 #include "Framework/DataProcessorSpec.h"
+#include "Framework/Task.h"
+
+#include "TRDBase/CoordinateTransformer.h"
 
 
 namespace o2
@@ -20,10 +19,20 @@ namespace o2
 namespace trd
 {
 
-framework::DataProcessorSpec getTRDCalibratedTrackletWriterSpec();
+class TRDTrackletTransformerSpec : public o2::framework::Task
+{
+ public:
+  // TRDTrackletTransformerSpec();
+  // ~TRDTrackletTransformerSpec() override = default;
+  void init(o2::framework::InitContext& ic) override;
+  void run(o2::framework::ProcessingContext& pc) override;
 
+  private:
+  o2::trd::CoordinateTransformer mTransformer;
+
+};
+
+o2::framework::DataProcessorSpec getTRDTrackletTransformerSpec();
 
 } // end namespace trd
 } // end namespace o2
-
-#endif

@@ -8,22 +8,11 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-
 #include "TRDWorkflow/TRDCalibratedTrackletWriterSpec.h"
 #include "DataFormatsTRD/CalibratedTracklet.h"
 
-#include "Framework/DataProcessorSpec.h"
 #include "DPLUtils/MakeRootTreeWriterSpec.h"
-#include "Framework/InputSpec.h"
 
-#include "TRDBase/Digit.h"
-#include <SimulationDataFormat/MCTruthContainer.h>
-#include "TRDBase/MCLabel.h"
-#include "DataFormatsTRD/TriggerRecord.h"
-#include "DataFormatsTRD/Tracklet64.h"
-
-#include <fstream>
-#include <iostream>
 
 using namespace o2::framework;
 
@@ -39,11 +28,11 @@ o2::framework::DataProcessorSpec getTRDCalibratedTrackletWriterSpec()
 {
   using MakeRootTreeWriterSpec = framework::MakeRootTreeWriterSpec;
 
-  return MakeRootTreeWriterSpec("ctracklet-writer",
+  return MakeRootTreeWriterSpec("calibrated-tracklet-writer",
                                 "trdcalibratedtracklets.root",
                                 "ctracklets",
                                 1,
-                                BranchDefinition<std::vector<CalibratedTracklet>>{InputSpec{"ctracklets", "TRD", "CALIBRATEDTRACKLETS"}, "CTracklets"})();
+                                BranchDefinition<std::vector<CalibratedTracklet>>{InputSpec{"ctracklets", "TRD", "CTRACKLETS"}, "CTracklets"})();
                                 // BranchDefinition<std::vector<o2::trd::TriggerRecord>>{InputSpec{"tracklettrigs", "TRD", "TRKTRGRD"}, "TrackTrg"})();
 };
 
