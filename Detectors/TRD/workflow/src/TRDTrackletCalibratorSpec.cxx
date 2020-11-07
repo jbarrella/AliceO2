@@ -9,14 +9,8 @@
 // or submit itself to any jurisdiction.
 
 #include "TRDWorkflow/TRDTrackletCalibratorSpec.h"
-#include "TBox.h"
-#include "TLine.h"
-#include "TMarker.h"
-#include "TArrow.h"
-#include "TLatex.h"
-#include "TTree.h"
 
-#include "TRDBase/Digit.h"
+#include "TTree.h"
 
 #include "FairLogger.h"
 #include "TRDSimulation/Detector.h"
@@ -27,8 +21,11 @@
 
 #include "TRDBase/SimParam.h"
 #include "TRDBase/CommonParam.h"
+#include "DataFormatsTRD/CalibratedTracklet.h"
 #include "DataFormatsTRD/Constants.h"
 
+
+// #include "TRDBase/CoordinateTransformer.h"
 
 
 using namespace o2::framework;
@@ -36,215 +33,99 @@ using SubSpecificationType = o2::framework::DataAllocator::SubSpecificationType;
 
 using namespace o2;
 using namespace trd;
-// using namespace std;
-
-
-class CoordinateTransformer
-{
-private:
-  o2::trd::Geometry* geo;
-
-public:
-  CoordinateTransformer() {
-    geo = o2::trd::Geometry::instance();
-    geo->createPadPlaneArray();
-  }
-
-  vector<double> transformToSpacePoint(int hcid, int padrow, int column, int position)
-  {
-    int idet = hcid/2;
-    int ilayer = (idet % 30) % 6;
-    int istack = (idet % 30) / 6;
-    auto padPlane = geo->getPadPlane(ilayer, istack);
-
-    double padWidth = padPlane->getWidthIPad();             // pad dimension in rphi-direction
-    
-    double padLength = padPlane->getLengthIPad();           // pad dimension in z-direction (I=inner, O=outer)
-    double oPadLength = padPlane->getLengthOPad();
-    
-    int nPadRows = padPlane->getNrows();
-   
-    float driftHeight = geo->cdrHght();
-
-
-    double x = driftHeight - 0.5;
-
-    double y;
-    if (hcid % 2 == 0)
-    {                                       // +1.5-9 to go from center pad 10 to physical MCM center | -1 for pad 0 overlap
-      y = (((double)position - 1024) * 1/75. + 1.5 - 9 - 1) * padWidth + ((double)column - 3) * padWidth * 18;     // upper edge of pad 71 at y = 0
-    }
-    else
-    {
-      y = (((double)position - 1024) * 1/75. + 1.5 + 9 - 1) * padWidth + (double)column * padWidth * 18;
-    }
-    
-    double z = ((double)padrow - nPadRows/2 + 0.5) * padLength;          // make this the middle of the pad. this is a lower bound on z. z is between padrow*padLength and (padrow+1)*padLength
-    if (padrow == nPadRows-1)
-    {
-      z += oPadLength - padLength;
-    }
-    if (padrow == 0)
-    {
-      z -= oPadLength - padLength;
-    }
-
-    return {x, y, z};
-  }
-
-  double calculateDy(int hcid, int slope)
-  {
-    int idet = hcid/2;
-    int ilayer = (idet % 30) % 6;
-    int istack = (idet % 30) / 6;
-    auto padPlane = geo->getPadPlane(ilayer, istack);
-
-    float driftHeight = geo->cdrHght();
-    float vDrift = 1.56;
-    double padWidth = padPlane->getWidthIPad();
-
-    double dy = slope * ((driftHeight / vDrift) / 0.1) * padWidth * 1/1000.;
-
-    return dy;
-  }
-};
 
 
 void TRDTrackletCalibratorSpec::init(o2::framework::InitContext& ic)
 {
   LOG(info) << "initializing tracklet calibrator";
 
-  CoordinateTransformer transformer;
-
-  // uint64_t hcid = 677;
-  // uint64_t idet = hcid/2;
-
-  // // int idet = 338;
-  // int ilayer = (idet % 30) % 6;
-  // int istack = (idet % 30) / 6;
-
-  // uint64_t padrow = 3;        // 0-15
-  // uint64_t column = 1;        // 0-3 | always 0 at the moment
-  // uint64_t position = 1024;    // 0-2047 | units:pad-widths | granularity=1/75 (measured from center pad 10) 1024 is 0/center of pad 10
-
-  // vector<double> plotPoint = spc.transformToSpacePoint(hcid, padrow, column, position);
+  // CoordinateTransformer transformer;
 }
 
 
 void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
 {
-  LOG(info) << "running tracklet calsssibrator";
+  LOG(info) << "running tracklet calibrator";
 
   // TH1D* h1d_position = new TH1D("position", "position", 256, 0, 2048);
   // TCanvas* h1d_position_can = new TCanvas("position", "position", 10, 10, 800, 600);
 
-  // std::vector<Tracklet64> calibratedTracklets;
+  std::vector<CalibratedTracklet> calibratedTracklets;
+  std::vector<Tracklet64> tracklets = pc.inputs().get<std::vector<Tracklet64>>("inTracklets");
   // std::vector<TriggerRecord> triggerRec = pc.inputs().get<std::vector<TriggerRecord>>("triggerRecord");
-  // std::vector<Tracklet64> tracklets = pc.inputs().get<std::vector<Tracklet64>>("inTracklets");
 
-  // // for (int reci=0; reci < triggerRec.size(); reci++)
-  // // {
-  // //   LOG(info) << triggerRec[reci].getFirstEntry() << " | " << triggerRec[reci].getNumberOfObjects();
-  // // }
+  // for (int reci=0; reci < triggerRec.size(); reci++)
+  // {
+  //   LOG(info) << triggerRec[reci].getFirstEntry() << " | " << triggerRec[reci].getNumberOfObjects();
+  // }
 
-  // // LOG(info) << tracklets.size();
+  // LOG(info) << tracklets.size();
 
-  // int nTimeBins = 24;
+  int nTimeBins = 24;
 
-  // auto geo = o2::trd::Geometry::instance();
-  // geo->createPadPlaneArray();
+  auto geo = o2::trd::Geometry::instance();
+  geo->createPadPlaneArray();
 
-  // for (int itracklet; itracklet < 550; ++itracklet) {
+  for (int itracklet; itracklet < 550; ++itracklet) {
 
-  //   Tracklet64* tracklet = &tracklets[itracklet];
+    Tracklet64* tracklet = &tracklets[itracklet];
 
-  //   // LOG(info) << triggerRec[0].getFirstEntry() << " | " << triggerRec[0].getNumberOfObjects();
+    // LOG(info) << triggerRec[0].getFirstEntry() << " | " << triggerRec[0].getNumberOfObjects();
 
-  //   // for (int reci=0; reci < triggerRec.size(); reci++)
-  //   // {
-  //   //   LOG(info) << triggerRec[reci].getFirstEntry() << " | " << triggerRec[reci].getNumberOfObjects();
-  //   // }
+    // for (int reci=0; reci < triggerRec.size(); reci++)
+    // {
+    //   LOG(info) << triggerRec[reci].getFirstEntry() << " | " << triggerRec[reci].getNumberOfObjects();
+    // }
     
 
-  //   double vDrift = 1.56;
+    double vDrift = 1.56;
 
-  //   uint64_t hcid = tracklet->getHCID();
-  //   uint64_t idet = hcid/2;
-
-  //   int ilayer = (idet % 30) % 6;
-  //   int istack = (idet % 30) / 6;
-  //   auto padPlane = geo->getPadPlane(ilayer, istack);
-
-  //   LOG(info) << idet;
-
-  //   // LOG(info) << "idet: " << idet << " | " << "istack: " << istack << " | " << "ilayer: " << ilayer;
-    
-  //   // inner: pads [1,142] | outer: pads 0,143
-  //   double padWidth = padPlane->getWidthIPad();             // pad dimension in rphi-direction
-  //   double padLength = padPlane->getLengthIPad();           // pad dimension in z-direction (I=inner, O=outer)
-  //   int nPadRows = padPlane->getNrows();
-  //   float driftHeight = geo->cdrHght();
+    uint64_t hcid = tracklet->getHCID();
+    uint64_t padrow = tracklet->getPadRow();        // 0-15
+    uint64_t column = tracklet->getColumn();        // 0-3 | always 0 at the moment
+    uint64_t position = tracklet->getPosition();    // 0-2048 | units:pad-widths | granularity=1/75 (measured from center pad 10) 1024 is 0/cetner of pad 10
+    uint64_t slope = tracklet->getSlope();          // 0-127 | units:pads/timebin | granularity=1/1000
 
 
-  //   uint64_t padrow = tracklet->getPadRow();        // 0-15
-  //   uint64_t column = tracklet->getColumn();        // 0-3 | always 0 at the moment
-  //   uint64_t position = tracklet->getPosition();    // 0-2048 | units:pad-widths | granularity=1/75 (measured from center pad 10) 1024 is 0/cetner of pad 10
-  //   uint64_t slope = tracklet->getSlope();          // 0-127 | units:pads/timebin | granularity=1/1000
-
-  //   // vector<double> plotPoint = spc.getSpacePoint(hcid, padrow, column, position);
-
-  //   // uncertainties ?
-    
-  //   float x = driftHeight - 0.5;                       // 5mm below cathode plane
-    
-  //   float y;
-  //   if (hcid % 2 == 0)
-  //   {                                                                                         // dont know at which x value this y position is reported
-  //     y = ((position - 1024) * 1/75. + 1.5 - 9) * padWidth + (column - 3) * padWidth * 18;     // upper edge of pad 71 at y = 0
-  //   }
-  //   else
-  //   {
-  //     y = ((position - 1024) * 1/75. + 1.5 + 9) * padWidth + column * padWidth * 18;
-  //   }
-    
-  //   float z = (padrow - nPadRows/2 + 0.5) * padLength;          // make this the middle of the pad. this is a lower bound on z. z is between padrow*padLength and (padrow+1)*padLength
-
-  //   // float dy = slope * nTimeBins * padWidth * 1/1000;   // nTimeBins should be number of timebins in drift region. 1 timebin is 100 nanosecond
-  //   float dy = slope * ((driftHeight / vDrift) / 0.1) * padWidth * 1/1000.;
-
-  //   // LOG(info) << "padrow: " << padrow;
-  //   // LOG(info) << "column: " << column;
-  //   // LOG(info) << "position: " << position;
-  //   // LOG(info) << "slope: " << slope;
-
-  //   // h1d_position->Fill(position);
-
-  //   LOG(info) << "x: " << x << " | " << "y: " << y << " | " << "z: " << z << " | " << "dy: " << dy;
+    // LOG(info) << "padrow: " << padrow;
+    // LOG(info) << "column: " << column;
+    // LOG(info) << "position: " << position;
+    // LOG(info) << "slope: " << slope;
 
 
-  //   // CALIBRATE dy and t0
+    std::vector<double> spacePoint = transformer.transformToSpacePoint(hcid, padrow, column, position);
+    double dy = transformer.calculateDy(hcid, slope);
 
-  //   // pull calibration parameters from ether
-  //   float t0Correction = -0.1;
+    // h1d_position->Fill(position);
 
-  //   float oldLorentzAngle = 0.16;
-  //   float lorentzAngle = -0.14;
-
-  //   float driftVRatio = 1.1;
-
-  //   // float driftDepth = 3.35;
-  //   float driftDepth = geo->cdrHght() + geo->camHght();
+    // LOG(info) << "spx: " << spacePoint[0] << " | " << "spy: " << spacePoint[1] << " | " << "spz: " << spacePoint[2] << " | " << "spdy: " << dy;
 
 
-  //   x += t0Correction;
+    // CALIBRATE dy and x
 
-  //   // LOG(info) << "dy: " << dy;
+    float t0Correction = -0.1;
 
-  //   float cmSlope = dy/driftDepth;
+    float oldLorentzAngle = 0.16;
+    float lorentzAngle = -0.14;
 
-  //   dy += - (TMath::Tan(lorentzAngle) * driftDepth) \
-  //         + (TMath::Tan(oldLorentzAngle) * driftDepth * driftVRatio) \
-  //         + cmSlope * (driftDepth * (1 - driftVRatio));
+    float driftVRatio = 1.1;
+
+    // float driftDepth = 3.35;
+    float driftDepth = geo->cdrHght() + geo->camHght();
+
+
+    spacePoint[0] += t0Correction;
+
+    // LOG(info) << "dy: " << dy;
+
+    float cmSlope = dy/driftDepth;
+
+    dy += - (TMath::Tan(lorentzAngle) * driftDepth) \
+          + (TMath::Tan(oldLorentzAngle) * driftDepth * driftVRatio) \
+          + cmSlope * (driftDepth * (1 - driftVRatio));
+
+
+    calibratedTracklets.emplace_back(spacePoint[0], spacePoint[1], spacePoint[2], dy);
 
 
     //--------------------------------------------------------------------------------------------------------------
@@ -282,11 +163,11 @@ void TRDTrackletCalibratorSpec::run(o2::framework::ProcessingContext& pc)
 
     // float global_X = local_X*cos(theta) - local_Y*sin(theta);
     // float global_Y = local_X*sin(theta) + local_Y*cos(theta);
-  // }
+  }
   // h1d_position_can->cd();
   // h1d_position->Draw();
   // h1d_position_can->Print("hist.png");
-  // pc.outputs().snapshot(Output{"TRD", "CTRACKLETS", 0, Lifetime::Timeframe}, calibratedTracklets);
+  pc.outputs().snapshot(Output{"TRD", "CALIBRATEDTRACKLETS", 0, Lifetime::Timeframe}, calibratedTracklets);
 }
 
 
@@ -295,12 +176,13 @@ o2::framework::DataProcessorSpec o2::trd::getTRDTrackletCalibratorSpec()
   LOG(info) << "getting TRDTrackletCalibratorSpec";
   return DataProcessorSpec{
     "TRDTRACKLETCALIBRATOR",
-    // Inputs{InputSpec{"inTracklets", "TRD", "TRACKLETS", 0},
-    //        InputSpec{"triggerRecord", "TRD", "TRKTRGRD", 0}
-    //        },
-    // Outputs{OutputSpec{"TRD", "CTRACKLETS", 0, Lifetime::Timeframe}},    
-    Inputs{},
-    Outputs{},
+    Inputs{InputSpec{"inTracklets", "TRD", "TRACKLETS", 0},
+          //  InputSpec{"triggerRecord", "TRD", "TRKTRGRD", 0}
+          //  InputSpec{"triggerRecord", "TRD", "TRIGGERREC", 0}
+           },
+    Outputs{OutputSpec{"TRD", "CALIBRATEDTRACKLETS", 0, Lifetime::Timeframe}},    
+    // Inputs{},
+    // Outputs{},
     AlgorithmSpec{adaptFromTask<TRDTrackletCalibratorSpec>()},
     Options{}};
 }

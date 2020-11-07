@@ -9,36 +9,48 @@
 // or submit itself to any jurisdiction.
 
 #include "TRDWorkflow/TRDTrackletCalibratorSpec.h"
+#include "TRDWorkflow/TRDCalibratedTrackletWriterSpec.h"
+#include "TRDWorkflow/TRDTrackletReaderSpec.h"
 
-#include "Framework/DeviceSpec.h"
-#include "Framework/runDataProcessing.h"
-#include "Framework/WorkflowSpec.h"
-#include "Framework/ConfigParamSpec.h"
-
-#include <cmath>
-#include <string>
+#include "CommonUtils/ConfigurableParam.h"
+#include "Framework/CompletionPolicy.h"
 
 
 using namespace o2::framework;
 
 // ------------------------------------------------------------------
 
-void customize(std::vector<o2::framework::ConfigParamSpec>& workflowoptions)
+void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
 {
-  // might need this
+  workflowOptions.push_back(ConfigParamSpec{
+    "root-in", o2::framework::VariantType::Bool, true, {"enable input from ROOT file"}});
+  workflowOptions.push_back(ConfigParamSpec{
+    "root-out", o2::framework::VariantType::Bool, true, {"enable output to ROOT file"}});
+
+  // std::string keyvaluehelp("Semicolon separated key=value strings ...");
+  // workflowOptions.push_back(ConfigParamSpec{"configKeyValues", VariantType::String, "", {keyvaluehelp}});
 }
 
 
-/// This function is required to be implemented to define the workflow
-/// specifications
+#include "Framework/runDataProcessing.h"
+
+
 WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
 {
-  return WorkflowSpec{
-    // read uncalibrated trackelts
-    // o2::trd::getTRDTrackletReaderSpec(),
-    // transform and calibrate
-    o2::trd::getTRDTrackletCalibratorSpec(),
-    // write calibrated tracklets
-    // o2::trd::getTRDTrackletWriterSpec()
-    };
+  // o2::conf::ConfigurableParam::updateFromString(configcontext.options().get<std::string>("root-in"));
+
+  bool rootIn = configcontext.options().get<bool>("root-in");
+  bool rootOut = configcontext.options().get<bool>("root-out");
+
+
+  WorkflowSpec spec;
+
+  if (rootIn) spec.emplace_back(o2::trd::getTRDTrackletReaderSpec(0));
+
+  spec.emplace_back(o2::trd::getTRDTrackletCalibratorSpec());
+
+  if (rootOut) spec.emplace_back(o2::trd::getTRDCalibratedTrackletWriterSpec());
+  
+
+  return spec;
 }

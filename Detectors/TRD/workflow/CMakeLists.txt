@@ -16,8 +16,11 @@ o2_add_library(TRDWorkflow
                        src/TRDDigitWriterSpec.cxx
                        src/TRDDigitReaderSpec.cxx
                        src/TRDTrackletWriterSpec.cxx
+                       src/TRDCalibratedTrackletWriterSpec.cxx
+                       src/TRDTrackletReaderSpec.cxx
                        src/TRDTrapRawWriterSpec.cxx
                        src/TRDTrapSimulatorSpec.cxx
+                       src/TRDTrackletCalibratorSpec.cxx
                        PUBLIC_LINK_LIBRARIES O2::Framework O2::DPLUtils O2::Steer O2::Algorithm O2::DataFormatsTRD O2::TRDSimulation O2::DetectorsBase O2::SimulationDataFormat O2::TRDBase)
 
                    #o2_target_root_dictionary(TRDWorkflow
@@ -34,20 +37,10 @@ o2_add_executable(trap-sim
                                         O2::TRDWorkflow)
 
 
-o2_add_library(TRDCalibratorWorkflow
-               TARGETVARNAME targetName
-               SOURCES src/TRDTrackletCalibratorSpec.cxx
-                       PUBLIC_LINK_LIBRARIES O2::Framework O2::DPLUtils O2::Algorithm O2::DataFormatsTRD O2::TRDSimulation O2::DetectorsBase O2::SimulationDataFormat O2::TRDBase)
-
-
 o2_add_executable(tracklet-calibrator
                   COMPONENT_NAME trd
                   SOURCES src/TRDTrackletCalibratorWorkflow.cxx
-                  PUBLIC_LINK_LIBRARIES O2::Framework
-                                        O2::DPLUtils
-                                        O2::TRDBase
-                                        O2::DataFormatsTRD
-                                        O2::TRDCalibratorWorkflow)
+                  PUBLIC_LINK_LIBRARIES O2::TRDWorkflow)
 
 
 if (OpenMP_CXX_FOUND)

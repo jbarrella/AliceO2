@@ -33,6 +33,10 @@
 #include "TRDBase/Geometry.h"
 
 
+#include "TRDBase/CoordinateTransformer.h"
+
+
+
 namespace o2
 {
 namespace trd
@@ -45,6 +49,10 @@ class TRDTrackletCalibratorSpec : public o2::framework::Task
   // ~TRDTrackletCalibratorSpec() override = default;
   void init(o2::framework::InitContext& ic) override;
   void run(o2::framework::ProcessingContext& pc) override;
+
+  private:
+  o2::trd::CoordinateTransformer transformer;
+
 };
 
 o2::framework::DataProcessorSpec getTRDTrackletCalibratorSpec();
