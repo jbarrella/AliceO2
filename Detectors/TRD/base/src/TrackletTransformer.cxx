@@ -99,7 +99,7 @@ double TrackletTransformer::calibrateDy(double rawDy, double oldLorentzAngle, do
 
   double calibratedDy = rawDy - (TMath::Tan(lorentzAngle) * driftDistance);
   calibratedDy += (TMath::Tan(oldLorentzAngle) * driftDistance * driftVRatio) + cmSlope * (driftDistance * (1 - driftVRatio));
-  
+
   // ALTERNATIVE METHOD
 
   // double x_anode_hit = driftDistance*driftVRatio/cmSlope;
