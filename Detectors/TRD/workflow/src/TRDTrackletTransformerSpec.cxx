@@ -69,15 +69,6 @@ void TRDTrackletTransformerSpec::run(o2::framework::ProcessingContext& pc)
     double calibratedDy = mTransformer.calibrateDy(rawDy, oldLorentzAngle, lorentzAngle, driftVRatio);
 
     calibratedTracklets.emplace_back(spacePoint[0], spacePoint[1], spacePoint[2], calibratedDy);
-
-    // GLOBAL TRANSFORM
-
-    // auto toRad = [] (float d) {return (d/360) * (2*M_PI);};
-    // //calculate roation amount based on sector number
-    // float theta = toRad(sector*20 + 10);
-
-    // float global_X = local_X*cos(theta) - local_Y*sin(theta);
-    // float global_Y = local_X*sin(theta) + local_Y*cos(theta);
   }
   pc.outputs().snapshot(Output{"TRD", "CTRACKLETS", 0, Lifetime::Timeframe}, calibratedTracklets);
 }
