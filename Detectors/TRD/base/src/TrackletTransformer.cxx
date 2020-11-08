@@ -97,7 +97,9 @@ double TrackletTransformer::calibrateDy(double rawDy, double oldLorentzAngle, do
 
   float cmSlope = rawDy / driftDistance;
 
-  double calibratedDy = rawDy - (TMath::Tan(lorentzAngle) * driftDistance) + (TMath::Tan(oldLorentzAngle) * driftDistance * driftVRatio) + cmSlope * (driftDistance * (1 - driftVRatio));
+  double calibratedDy = rawDy - (TMath::Tan(lorentzAngle) * driftDistance) \
+  + (TMath::Tan(oldLorentzAngle) * driftDistance * driftVRatio) \
+  + cmSlope * (driftDistance * (1 - driftVRatio));
 
   // ALTERNATIVE METHOD
 

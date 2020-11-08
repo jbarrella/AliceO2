@@ -20,9 +20,6 @@ namespace trd
 
 class TrackletTransformer
 {
- private:
-  o2::trd::Geometry* mgeo;
-
  public:
   TrackletTransformer();
   ~TrackletTransformer() = default;
@@ -34,6 +31,9 @@ class TrackletTransformer
   double calibrateX(double x, double t0Correction);
 
   double calibrateDy(double rawDy, double oldLorentzAngle, double lorentzAngle, double driftVRatio);
+
+ private:
+  o2::trd::Geometry* mgeo;
 };
 
 } // namespace trd

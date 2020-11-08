@@ -18,16 +18,8 @@ namespace trd
 
 class CalibratedTracklet
 {
- private:
-  double mx;
-  double my;
-  double mz;
-  double mdy;
-
  public:
-  CalibratedTracklet()
-  {
-  }
+  CalibratedTracklet() = default;
   CalibratedTracklet(double x, double y, double z, double dy)
   {
     mx = x;
@@ -46,6 +38,12 @@ class CalibratedTracklet
   void setY(double y) { my = y; }
   void setZ(double z) { mz = z; }
   void setDy(double dy) { mdy = dy; }
+
+ private:
+  double mx;
+  double my;
+  double mz;
+  double mdy;
 };
 
 } // namespace trd
