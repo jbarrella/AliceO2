@@ -75,7 +75,7 @@ double TrackletTransformer::calculateDy(int hcid, int slope)
 
   float vDrift = 1.56;
   float driftHeight = mgeo->cdrHght();
-  
+
   // dy = slope * nTimeBins * padWidth * 1/1000;
   // nTimeBins should be number of timebins in drift region. 1 timebin is 100 nanosecond
   double dy = slope * ((driftHeight / vDrift) / 0.1) * padWidth * 1 / 1000.;
@@ -97,10 +97,9 @@ double TrackletTransformer::calibrateDy(double rawDy, double oldLorentzAngle, do
 
   float cmSlope = rawDy / driftDistance;
 
-  double calibratedDy = rawDy - (TMath::Tan(lorentzAngle) * driftDistance) \
-  + (TMath::Tan(oldLorentzAngle) * driftDistance * driftVRatio) \
-  + cmSlope * (driftDistance * (1 - driftVRatio));
-
+  double calibratedDy = rawDy - (TMath::Tan(lorentzAngle) * driftDistance);
+  calibratedDy += (TMath::Tan(oldLorentzAngle) * driftDistance * driftVRatio) + cmSlope * (driftDistance * (1 - driftVRatio));
+  
   // ALTERNATIVE METHOD
 
   // double x_anode_hit = driftDistance*driftVRatio/cmSlope;

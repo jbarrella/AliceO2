@@ -53,7 +53,7 @@ void TRDTrackletTransformerSpec::run(o2::framework::ProcessingContext& pc)
     // 0-2048 | units:pad-widths | granularity=1/75 (measured from center pad 10) 1024 is 0/cetner of pad 10
     uint64_t position = tracklet->getPosition();
     // 0-127 | units:pads/timebin | granularity=1/1000
-    uint64_t slope = tracklet->getSlope();       
+    uint64_t slope = tracklet->getSlope();
 
     std::vector<double> spacePoint = mTransformer.transformToSpacePoint(hcid, padrow, column, position);
 
