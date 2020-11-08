@@ -13,7 +13,6 @@
 
 #include "DPLUtils/MakeRootTreeWriterSpec.h"
 
-
 using namespace o2::framework;
 
 namespace o2
@@ -33,7 +32,7 @@ o2::framework::DataProcessorSpec getTRDCalibratedTrackletWriterSpec()
                                 "ctracklets",
                                 1,
                                 BranchDefinition<std::vector<CalibratedTracklet>>{InputSpec{"ctracklets", "TRD", "CTRACKLETS"}, "CTracklets"})();
-                                // BranchDefinition<std::vector<o2::trd::TriggerRecord>>{InputSpec{"tracklettrigs", "TRD", "TRKTRGRD"}, "TrackTrg"})();
+  // BranchDefinition<std::vector<o2::trd::TriggerRecord>>{InputSpec{"tracklettrigs", "TRD", "TRKTRGRD"}, "TrackTrg"})();
 };
 
 } // end namespace trd
