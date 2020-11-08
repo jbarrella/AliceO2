@@ -11,9 +11,7 @@
 #ifndef O2_TRDCALIBRATEDTRACKLETWRITER_H
 #define O2_TRDCALIBRATEDTRACKLETWRITER_H
 
-
 #include "Framework/DataProcessorSpec.h"
-
 
 namespace o2
 {
@@ -21,7 +19,6 @@ namespace trd
 {
 
 framework::DataProcessorSpec getTRDCalibratedTrackletWriterSpec();
-
 
 } // end namespace trd
 } // end namespace o2

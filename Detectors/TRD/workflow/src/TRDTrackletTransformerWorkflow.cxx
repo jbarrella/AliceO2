@@ -15,42 +15,32 @@
 #include "CommonUtils/ConfigurableParam.h"
 #include "Framework/CompletionPolicy.h"
 
-
 using namespace o2::framework;
 
-// ------------------------------------------------------------------
-
-void customize(std::vector<o2::framework::ConfigParamSpec>& workflowOptions)
+void customize(std::vector<ConfigParamSpec>& workflowOptions)
 {
   workflowOptions.push_back(ConfigParamSpec{
-    "root-in", o2::framework::VariantType::Bool, true, {"enable input from ROOT file"}});
+    "root-in", VariantType::Int, 1, {"enable (1) or disable (0) input from ROOT file"}});
   workflowOptions.push_back(ConfigParamSpec{
-    "root-out", o2::framework::VariantType::Bool, true, {"enable output to ROOT file"}});
-
-  // std::string keyvaluehelp("Semicolon separated key=value strings ...");
-  // workflowOptions.push_back(ConfigParamSpec{"configKeyValues", VariantType::String, "", {keyvaluehelp}});
+    "root-out", VariantType::Int, 1, {"enable (1) or disable (0) output to ROOT file"}});
 }
-
 
 #include "Framework/runDataProcessing.h"
 
-
 WorkflowSpec defineDataProcessing(ConfigContext const& configcontext)
 {
-  // o2::conf::ConfigurableParam::updateFromString(configcontext.options().get<std::string>("root-in"));
-
-  bool rootIn = configcontext.options().get<bool>("root-in");
-  bool rootOut = configcontext.options().get<bool>("root-out");
-
+  int rootIn = configcontext.options().get<int>("root-in");
+  int rootOut = configcontext.options().get<int>("root-out");
 
   WorkflowSpec spec;
 
-  if (rootIn) spec.emplace_back(o2::trd::getTRDTrackletReaderSpec(0));
+  if (rootIn)
+    spec.emplace_back(o2::trd::getTRDTrackletReaderSpec(0));
 
   spec.emplace_back(o2::trd::getTRDTrackletTransformerSpec());
 
-  if (rootOut) spec.emplace_back(o2::trd::getTRDCalibratedTrackletWriterSpec());
-  
+  if (rootOut)
+    spec.emplace_back(o2::trd::getTRDCalibratedTrackletWriterSpec());
 
   return spec;
 }

@@ -8,32 +8,35 @@
 // granted to it by virtue of its status as an Intergovernmental Organization
 // or submit itself to any jurisdiction.
 
-#ifndef O2_TRD_COORDINATETRANSFORMER_H
-#define O2_TRD_COORDINATETRANSFORMER_H
-
+#ifndef O2_TRD_TRACKLETTRANSFORMER_H
+#define O2_TRD_TRACKLETTRANSFORMER_H
 
 #include "TRDBase/Geometry.h"
-
 
 namespace o2
 {
 namespace trd
 {
 
-class CoordinateTransformer
+class TrackletTransformer
 {
-  private:
+ private:
   o2::trd::Geometry* mgeo;
 
-  public:
-  CoordinateTransformer();
-  ~CoordinateTransformer() = default;
+ public:
+  TrackletTransformer();
+  ~TrackletTransformer() = default;
 
   std::vector<double> transformToSpacePoint(int hcid, int padrow, int column, int position);
 
   double calculateDy(int hcid, int slope);
+
+  double calibrateX(double x, double t0Correction);
+
+  double calibrateDy(double rawDy, double oldLorentzAngle, double lorentzAngle, double driftVRatio);
 };
 
-}
-}
+} // namespace trd
+} // namespace o2
+
 #endif

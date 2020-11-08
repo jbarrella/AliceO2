@@ -29,7 +29,7 @@ o2_add_library(TRDBase
                        src/ChamberNoise.cxx
                        src/CalOnlineGainTables.cxx
                        src/Tracklet.cxx
-                       src/CoordinateTransformer.cxx
+                       src/TrackletTransformer.cxx
                PUBLIC_LINK_LIBRARIES O2::GPUCommon
                                      O2::GPUUtils
                                      O2::DetectorsCommonDataFormats
@@ -65,7 +65,7 @@ o2_target_root_dictionary(TRDBase
                                   include/TRDBase/ChamberNoise.h
                                   include/TRDBase/CalOnlineGainTables.h
                                   include/TRDBase/Tracklet.h
-                                  include/TRDBase/CoordinateTransformer.h)
+                                  include/TRDBase/TrackletTransformer.h)
 
 o2_add_test(DiffusionCoefficient
             SOURCES test/testTRDDiffusionCoefficient.cxx

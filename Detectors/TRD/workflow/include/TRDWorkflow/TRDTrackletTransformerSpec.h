@@ -11,8 +11,7 @@
 #include "Framework/DataProcessorSpec.h"
 #include "Framework/Task.h"
 
-#include "TRDBase/CoordinateTransformer.h"
-
+#include "TRDBase/TrackletTransformer.h"
 
 namespace o2
 {
@@ -27,9 +26,8 @@ class TRDTrackletTransformerSpec : public o2::framework::Task
   void init(o2::framework::InitContext& ic) override;
   void run(o2::framework::ProcessingContext& pc) override;
 
-  private:
-  o2::trd::CoordinateTransformer mTransformer;
-
+ private:
+  o2::trd::TrackletTransformer mTransformer;
 };
 
 o2::framework::DataProcessorSpec getTRDTrackletTransformerSpec();
