@@ -156,3 +156,21 @@ CalibratedTracklet TrackletTransformer::transformTracklet(Tracklet64 tracklet)
 
   return calibratedTracklet;
 }
+
+double TrackletTransformer::getTimebin(double x)
+{
+  // calibration parameters need to be extracted from OCDB in the future
+  double vDrift = 1.5625; // in cm/us
+  double t0 = 4.0;        // time (in timebins) of start of drift region
+
+  double timebin;
+  if (x < -0.35) {
+    // drift region
+    timebin = t0 - (x + 0.35) / (vDrift / 10.0);
+  } else {
+    // anode region: very rough guess
+    timebin = t0 - 1.0 + fabs(x);
+  }
+
+  return timebin;
+}

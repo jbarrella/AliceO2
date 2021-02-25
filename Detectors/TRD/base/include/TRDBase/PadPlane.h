@@ -13,8 +13,11 @@
 
 //Forwards to standard header with protection for GPU compilation
 #include "GPUCommonRtypes.h" // for ClassDef
-
+#include <array>
 #include "GPUCommonDef.h"
+#include <iostream>
+
+// #include "DataFormatsTRD/Hit.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //                                                                        //
@@ -71,9 +74,25 @@ class PadPlane
 
   GPUd() int getPadRowNumber(double z) const;
   GPUd() int getPadRowNumberROC(double z) const;
+  GPUd() double getPadRow(double z) const;
   GPUd() int getPadColNumber(double rphi) const;
+  GPUd() double getPad(double y, double z) const;
 
-  GPUd() double getTiltOffset(double rowOffset) const { return mTiltingTan * (rowOffset - 0.5 * mLengthIPad); };
+  GPUd() double getTiltOffset(double rowOffset) const
+  // This function assumes that the outer pads are not tilted about their center
+  {
+    return mTiltingTan * (rowOffset - 0.5 * mLengthIPad);
+  };
+  // GPUd() double getTiltOffset(int row, double rowOffset) const
+  // This alternative assumes all pads are tilted about their center and that the axes on the diagram in 
+  // TRD TDR page 28 are correct.
+  // {
+  //   if (row == 0 || row == mNrows - 1) {
+  //     return mTiltingTan * -(rowOffset - 0.5 * mLengthOPad);
+  //   } else {
+  //     return mTiltingTan * -(rowOffset - 0.5 * mLengthIPad);
+  //   }
+  // };
   GPUd() double getPadRowOffset(int row, double z) const
   {
     if ((row < 0) || (row >= mNrows)) {
@@ -138,6 +157,10 @@ class PadPlane
   GPUd() double getWidthOPad() const { return mWidthOPad; };
   GPUd() double getWidthIPad() const { return mWidthIPad; };
   GPUd() double getAnodeWireOffset() const { return mAnodeWireOffset; };
+
+  // std::array<double, 3> Hit2RowColTime(const o2::trd::Hit& hit);
+
+  std::array<double, 3> Local2RowColTime(double x, double y, double z) const;
 
  protected:
   static constexpr int MAXCOLS = 144;

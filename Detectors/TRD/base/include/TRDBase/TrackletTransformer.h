@@ -14,6 +14,7 @@
 #include "TRDBase/Geometry.h"
 #include "DataFormatsTRD/Tracklet64.h"
 #include "DataFormatsTRD/CalibratedTracklet.h"
+#include "DataFormatsTRD/Hit.h"
 
 namespace o2
 {
@@ -49,6 +50,8 @@ class TrackletTransformer
   std::array<float, 3> transformL2T(int hcid, std::array<double, 3> spacePoint);
 
   CalibratedTracklet transformTracklet(Tracklet64 tracklet);
+
+  double getTimebin(double x);
 
  private:
   o2::trd::Geometry* mGeo;
