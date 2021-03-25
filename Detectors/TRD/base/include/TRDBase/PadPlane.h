@@ -84,7 +84,7 @@ class PadPlane
     return mTiltingTan * (rowOffset - 0.5 * mLengthIPad);
   };
   // GPUd() double getTiltOffset(int row, double rowOffset) const
-  // This alternative assumes all pads are tilted about their center and that the axes on the diagram in 
+  // This alternative assumes all pads are tilted about their center and that the axes on the diagram in
   // TRD TDR page 28 are correct.
   // {
   //   if (row == 0 || row == mNrows - 1) {
