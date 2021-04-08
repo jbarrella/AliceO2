@@ -14,6 +14,7 @@
 #include "TRDBase/Geometry.h"
 #include "DataFormatsTRD/Tracklet64.h"
 #include "DataFormatsTRD/CalibratedTracklet.h"
+#include "CCDB/BasicCCDBManager.h"
 
 namespace o2
 {
@@ -38,6 +39,8 @@ class TrackletTransformer
 
   void loadPadPlane(int hcid);
 
+  void loadCalibrationParameters();
+
   float calculateY(int hcid, int column, int position);
 
   float calculateZ(int padrow);
@@ -60,6 +63,10 @@ class TrackletTransformer
   float mXAnode;
   float mXDrift;
   float mXtb0;
+
+  std::vector<float>* mVdrift;
+  std::vector<float>* mT0;
+  std::vector<float>* mExB;
 
   float mt0Correction;
   float mOldLorentzAngle;

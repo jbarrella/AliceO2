@@ -47,6 +47,33 @@ void TrackletTransformer::loadPadPlane(int hcid)
   mPadPlane = mGeo->getPadPlane(layer, stack);
 }
 
+void TrackletTransformer::loadCalibrationParameters()
+{
+  LOG(info) << "loading calibration parameters ";
+
+  auto& ccdbmgr = o2::ccdb::BasicCCDBManager::instance();
+  // ccdbmgr.setTimestamp(297595);
+
+  mVdrift = ccdbmgr.get<std::vector<float>>("TRD/Calib/ChamberVdrift");
+  mT0 = ccdbmgr.get<std::vector<float>>("TRD/Calib/ChamberT0");
+  mExB = ccdbmgr.get<std::vector<float>>("TRD/Calib/ChamberExB");
+
+  // std::cout << mVdrift->size() << std::endl;
+  // for (int i = 0; i < mVdrift->size(); ++i) {
+  //   std::cout << mVdrift->at(i) << std::endl;
+  // }
+
+  if (mVdrift == nullptr) {
+    LOG(warn) << " failed to get mVdrift parameters from ccdb";
+  }
+  if (mT0 == nullptr) {
+    LOG(warn) << " failed to get mT0 parameters from ccdb";
+  }
+  if (mExB == nullptr) {
+    LOG(warn) << " failed to get mExB parameters from ccdb";
+  }
+}
+
 float TrackletTransformer::calculateY(int hcid, int column, int position)
 {
   double padWidth = mPadPlane->getWidthIPad();
