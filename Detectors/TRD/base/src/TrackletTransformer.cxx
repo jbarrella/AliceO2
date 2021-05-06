@@ -47,6 +47,23 @@ void TrackletTransformer::loadPadPlane(int hcid)
   mPadPlane = mGeo->getPadPlane(layer, stack);
 }
 
+void TrackletTransformer::loadCalibrationParameters(int detector, int timestamp)
+{
+  LOG(info) << "loading calibration parameters ";
+
+  auto& ccdbmgr = o2::ccdb::BasicCCDBManager::instance();
+  ccdbmgr.setTimestamp(timestamp);
+
+  o2::trd::CalVdriftExB* params = ccdbmgr.get<o2::trd::CalVdriftExB>("TRD_test/CalVdriftExB");
+
+  if (params == nullptr) {
+    LOG(fatal) << " failed to get calibration parameters from ccdb";
+  }
+
+  mVDrift = params->getVDrift(detector);
+  mExB = params->getExB(detector);
+}
+
 float TrackletTransformer::calculateY(int hcid, int column, int position)
 {
   double padWidth = mPadPlane->getWidthIPad();

@@ -11,9 +11,11 @@
 #ifndef O2_TRD_TRACKLETTRANSFORMER_H
 #define O2_TRD_TRACKLETTRANSFORMER_H
 
-#include "TRDBase/Geometry.h"
+// #include "TRDBase/Geometry.h"
 #include "DataFormatsTRD/Tracklet64.h"
 #include "DataFormatsTRD/CalibratedTracklet.h"
+#include "CCDB/BasicCCDBManager.h"
+#include "TRDBase/CalVdriftExB.h"
 
 namespace o2
 {
@@ -37,6 +39,8 @@ class TrackletTransformer
   void setXtb0(float x) { mXtb0 = x; }
 
   void loadPadPlane(int hcid);
+
+  void loadCalibrationParameters(int detector, int timestamp);
 
   float calculateY(int hcid, int column, int position);
 
@@ -65,6 +69,9 @@ class TrackletTransformer
   float mOldLorentzAngle;
   float mLorentzAngle;
   float mDriftVRatio;
+
+  float mVDrift;
+  float mExB;
 };
 
 } // namespace trd
